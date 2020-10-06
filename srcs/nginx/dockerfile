@@ -1,0 +1,44 @@
+FROM alpine:latest
+
+
+ENV SSH_USER="admin" \
+    SSH_PASSWORD="admin" \ 
+    SSH_MOTD="hallo goedendag!!"
+
+
+# GENERAL
+RUN apk update
+RUN apk add nginx bash openrc --no-cache
+
+
+# SSH - Downloadnig open ssh
+RUN apk add openssh 
+# SSH - Using custom config with port 22
+COPY srcs/ssh/sshd_config.conf /etc/ssh/sshd_config
+# SSH - Adding user defines at ENV at the top
+RUN adduser -D ${SSH_USER}
+# SSH - Changing the password of SSH_USER
+RUN echo "${SSH_USER}:${SSH_PASSWORD}" | chpasswd
+# SSH - Generating certificates
+RUN ssh-keygen -A
+
+# SSH - Adding Custom Motd
+RUN echo -e ${SSH_MOTD} > etc/motd
+
+
+# NGINX
+COPY srcs/nginx.conf /etc/nginx/nginx.conf
+COPY srcs/index.html /usr/share/nginx/html/index.html
+RUN mkdir -p /run/nginx
+
+
+# SSL - priv key
+COPY srcs/ssl/localhost.pem localhost.pem
+# SSL - pub key
+COPY srcs/ssl/localhost-key.pem localhost-key.pem
+
+
+# General - entrypoint
+COPY srcs/start.sh /start.sh
+EXPOSE 80 443 22
+ENTRYPOINT sh /start.sh
