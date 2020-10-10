@@ -5,11 +5,12 @@ metadata:
   labels:
     app: mysql
 spec:
-  ports:
-    - port: 3306
   selector:
     app: mysql
-  clusterIP: None
+  ports:
+    - name: mysql
+      port: 3306
+      targetPort: 3306
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -31,7 +32,6 @@ metadata:
   labels:
     app: mysql
 spec:
-  replicas: 1 # test what this is
   selector:
     matchLabels:
       app: mysql
@@ -42,10 +42,10 @@ spec:
       labels:
         app: mysql
     spec:
-    #      restartPolicy: Always
+#          restartPolicy: Always
       containers:
       - image: mysql
-      #        imagePullPolicy: Never
+        imagePullPolicy: Never
         name: mysql
         env:
         - name: MYSQL_ROOT_PASSWORD

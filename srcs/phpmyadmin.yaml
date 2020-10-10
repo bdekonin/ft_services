@@ -1,44 +1,46 @@
+# # https://rtfm.co.ua/en/kubernetes-clusterip-vs-nodeport-vs-loadbalancer-services-and-ingress-an-overview-with-examples/
 apiVersion: v1
 kind: Service
 metadata:
   name: phpmyadmin
-  labels:
-    app: phpmyadmin
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
-    app: phpmyadmin
+    app: phpmyadmin # Selects the pod called nginx
   ports:
-    - name: http
-      port: 80
-      nodePort: 5000
+  - name: phpmyadmin
+    port: 5000
+    targetPort: 80
+    protocol: TCP
 ---
-apiVersion: apps/v1
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
   name: phpmyadmin
   labels:
     app: phpmyadmin
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: phpmyadmin
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
         app: phpmyadmin
     spec:
       containers:
-        - name: phpmyadmin
-          image: phpmyadmin
-          ports:
-            - containerPort: 80
-              name: phpmyadmin
-          env:
-            - name: MYSQL_HOSTNAME
-              value: mysql
-            - name: PMA_USERNAME
-              value: root
-            - name: PMA_PASSWORD
-              value: password
+      - image: phpmyadmin
+        imagePullPolicy: Never
+        name: phpmyadmin
+        env:
+        - name: PMA_HOST
+          value: mysql
+        - name: PMA_PORT
+          value: "3306"
+        - name: PMA_USER
+          value: root
+        ports:
+        - containerPort: 80
+          name: phpmyadmin

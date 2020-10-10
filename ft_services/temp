@@ -1,4 +1,0 @@
-kubectl apply -f srcs/ingress.yaml
-kubectl get ingress
-minikube ip
-minikube dashboard
