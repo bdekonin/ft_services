@@ -31,24 +31,38 @@ kubectl create secret generic -n metallb-system memberlist --from-literal=secret
 kubectl apply -f srcs/metallb/metallb.yaml
 
 # Building nginx
-docker build -t nginx srcs/nginx # nginx
 docker build -t mysql srcs/mysql # mysql
-docker build -t phpmyadmin srcs/phpmyadmin # mysql
-
-
-kubectl apply -f srcs/nginx.yaml # nginx
 kubectl apply -f srcs/mysql.yaml # mysql
-kubectl apply -f srcs/phpmyadmin.yaml # mysql
 
 
-# mysql --host=172.17.0.2 --user=root --password
+docker build -t nginx srcs/nginx # nginx
+kubectl apply -f srcs/nginx.yaml # nginx
+
+docker build -t phpmyadmin srcs/phpmyadmin # phpmyadmin
+kubectl apply -f srcs/phpmyadmin.yaml # phpmyadmin
+
+docker build -t wordpress srcs/wordpress # wordpress
+kubectl apply -f srcs/wordpress.yaml # wordpress
+
+docker build -t influxdb srcs/influxdb
+kubectl apply -f srcs/influxdb.yaml
+
+docker build -t grafana srcs/grafana
+kubectl apply -f srcs/grafana.yaml
+
+
+# A WordPress website listening on port 5050, which will work with a MySQL database.
+# Both services have to run in separate containers.
+# The WordPress website will have several users and an administrator.
+# Wordpress needs its own nginx server.
+# The Load Balancer should be able to redirect directly to this service.
 
 
 
 
 
 
-# echo "--------------------------------------------------------------------------------
-# Service:
-# 	nginx:		http://$MINIKUBE_IP
-# 	nginx:		https://$MINIKUBE_IP"
+echo "--------------------------------------------------------------------------------
+Service:
+	phpmyadmin: 192.168.64.100:5000
+	nginx:		http://$MINIKUBE_IP"

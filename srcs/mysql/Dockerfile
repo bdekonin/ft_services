@@ -10,6 +10,8 @@ RUN apk add --update mysql mysql-client && rm -f /var/cache/apk/*
 COPY my.cnf /etc/mysql/my.cnf
 RUN mkdir /app
 
+RUN mkdir -p data/mysql/
+COPY database data/mysql/database
 
 COPY mysql.sh entrypoint.sh
 # RUN chmod 777 init_mysql.sh

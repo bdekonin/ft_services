@@ -1,0 +1,33 @@
+FROM alpine:latest
+
+# GENERAL
+RUN apk update
+RUN apk add nginx bash --no-cache
+RUN apk add php7 php7-fpm php7-opcache php7-gd php7-mysqli php7-zlib php7-curl php7-mbstring php7-json php-phar php7-session openrc unzip
+
+RUN mkdir -p /var/www/html
+
+# Nginx
+COPY srcs/nginx/default.conf etc/nginx/conf.d/default.conf
+
+# Wordpress cli
+RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+RUN chmod 777 wp-cli.phar
+RUN mv wp-cli.phar /usr/local/bin/wp
+
+# Wordpress
+RUN wget https://wordpress.org/latest.tar.gz -P /tmp
+RUN tar xzf /tmp/latest.tar.gz --strip-components=1 -C /var/www/html
+COPY srcs/wp-config.php var/www/html/wp-config.php
+RUN chown -R root: /var/www/html
+RUN mkdir var/www/html/wp-content/uploads && chmod -R 777 var/www/html/wp-content/uploads
+COPY srcs/upload_max.zip /var/www/html/wp-content/plugins
+RUN cd /var/www/html/wp-content/plugins && unzip upload_max.zip && rm upload_max.zip
+
+
+# Entrypoint
+COPY start.sh .
+RUN chmod +x start.sh
+
+EXPOSE 80
+ENTRYPOINT sh /start.sh

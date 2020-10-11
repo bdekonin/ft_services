@@ -1,0 +1,51 @@
+# # https://rtfm.co.ua/en/kubernetes-clusterip-vs-nodeport-vs-loadbalancer-services-and-ingress-an-overview-with-examples/
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  type: LoadBalancer
+  selector:
+    app: wordpress # Selects the pod called nginx
+  ports:
+  - name: wordpress
+    port: 5050
+    targetPort: 80
+    protocol: TCP
+---
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: wordpress
+  labels:
+    app: wordpress
+spec:
+  selector:
+    matchLabels:
+      app: wordpress
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - image: wordpress
+        imagePullPolicy: Never
+        name: wordpress
+        env:
+        - name: MYSQL_DATABASE
+          value: wordpress_db
+        - name: MYSQL_USER
+          value: root
+        - name: MYSQL_PASSWORD
+          value: password
+        - name: MYSQL_HOST
+          value: mysql
+        ports:
+        - containerPort: 80

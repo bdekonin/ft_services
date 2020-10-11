@@ -4,50 +4,40 @@ kind: Service
 metadata:
   annotations:
     metallb.universe.tf/allow-shared-ip: shared
-  name: nginx
+  name: grafana
   labels:
-    app: nginx
+    app: grafana
 spec:
   type: LoadBalancer
   selector:
-    app: nginx # Selects the pod called nginx
+    app: grafana # Selects the pod called grafana
   ports:
-  - name: ssh
-    port: 22
-    targetPort: 22
-    protocol: TCP
-  - name: http
-    port: 80
-    targetPort: 80
-    protocol: TCP
-  - name: https
-    port: 443
-    targetPort: 443
+  - name: grafana
+    port: 3000
+    targetPort: 3000
     protocol: TCP
 ---
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    name: nginx
+    name: grafana
     labels:
-      app: nginx
+      app: grafana
   spec:
     strategy:
       type: Recreate
     selector:
       matchLabels:
-        app: nginx
+        app: grafana
     replicas: 1
     template:
       metadata:
         labels:
-          app: nginx
+          app: grafana
       spec:
         containers:
-        - name: nginx
-          image: nginx
+        - name: grafana
+          image: grafana
           imagePullPolicy: Never
           ports:
-          - containerPort: 80
-          - containerPort: 443
-          - containerPort: 22
+          - containerPort: 3000

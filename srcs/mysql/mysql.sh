@@ -35,5 +35,8 @@ fi
 rm -f $tfile
 echo Bootstraping done!
 
+
+mv data/mysql/database data/mysql/$MYSQL_DATABASE
+
 echo Launching mysql server!
 exec /usr/bin/mysqld --user=root --console

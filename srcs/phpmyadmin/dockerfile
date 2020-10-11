@@ -1,12 +1,25 @@
 FROM alpine:latest
 
-# GENERAL
-RUN apk update
-RUN apk add nginx bash openrc --no-cache
+RUN apk update && apk upgrade && apk add bash \
+&& apk add php7 php7-fpm php7-opcache php7-gd php7-mysqli php7-zlib php7-curl php7-mbstring php7-json php7-session openrc
 
-# General - entrypoint
-COPY srcs/nginx/entrypoint.sh /start.sh
+RUN mkdir -p /var/www
+RUN wget https://files.phpmyadmin.net/phpMyAdmin/5.0.3/phpMyAdmin-5.0.3-all-languages.tar.gz \
+&& tar -xvf phpMyAdmin-5.0.3-all-languages.tar.gz \
+&& mv phpMyAdmin-5.0.3-all-languages /var/www/html \
+&& rm -rf /var/cache/apk/*
 
+COPY srcs/phpmyadmin.php  /var/www/html/config.inc.php
+COPY srcs/setup.sh .
+
+RUN apk add nginx 
+COPY srcs/default.conf etc/nginx/conf.d/default.conf
+
+RUN mkdir -p /var/www/html/tmp/
+RUN chmod 777 /var/www/html/tmp/
+RUN chown -R root: var/www/html
+
+RUN chmod +x setup.sh
 EXPOSE 5000
 
-ENTRYPOINT sh /start.sh
+CMD ./setup.sh

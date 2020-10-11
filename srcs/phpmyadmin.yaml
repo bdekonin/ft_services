@@ -2,7 +2,11 @@
 apiVersion: v1
 kind: Service
 metadata:
+  annotations:
+    metallb.universe.tf/allow-shared-ip: shared
   name: phpmyadmin
+  labels:
+    app: phpmyadmin
 spec:
   type: LoadBalancer
   selector:
@@ -41,6 +45,7 @@ spec:
           value: "3306"
         - name: PMA_USER
           value: root
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
         ports:
         - containerPort: 80
-          name: phpmyadmin
