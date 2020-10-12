@@ -16,6 +16,8 @@ then
 fi
 MINIKUBE_IP=$(minikube ip)
 
+kubectl create namespace monitoring # https://blog.gojekengineering.com/diy-set-up-telegraf-influxdb-grafana-on-kubernetes-d55e32f8ce48
+
 # Start things
 # Linking docker with minikube
 eval $(minikube docker-env)
