@@ -16,7 +16,9 @@ then
 fi
 MINIKUBE_IP=$(minikube ip)
 
-kubectl create namespace monitoring # https://blog.gojekengineering.com/diy-set-up-telegraf-influxdb-grafana-on-kubernetes-d55e32f8ce48
+
+# kubectl create serviceaccount admin
+# kubectl
 
 # Start things
 # Linking docker with minikube
@@ -32,9 +34,15 @@ kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manife
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 kubectl apply -f srcs/metallb/metallb.yaml
 
+kubectl create serviceaccount admin
+kubectl apply -f serviceaccount.yaml
+
 # Building nginx
 docker build -t mysql srcs/mysql # mysql
 kubectl apply -f srcs/mysql.yaml # mysql
+
+docker build -t influxdb srcs/influxdb
+kubectl apply -f srcs/influxdb.yaml
 
 
 docker build -t nginx srcs/nginx # nginx
@@ -46,8 +54,8 @@ kubectl apply -f srcs/phpmyadmin.yaml # phpmyadmin
 docker build -t wordpress srcs/wordpress # wordpress
 kubectl apply -f srcs/wordpress.yaml # wordpress
 
-docker build -t influxdb srcs/influxdb
-kubectl apply -f srcs/influxdb.yaml
+docker build -t telegraf srcs/telegraf
+kubectl apply -f srcs/telegraf.yaml
 
 docker build -t grafana srcs/grafana
 kubectl apply -f srcs/grafana.yaml

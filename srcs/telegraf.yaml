@@ -2,41 +2,39 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    metallb.universe.tf/allow-shared-ip: shared
-  name: influxdb
+  name: telegraf
   labels:
-    app: influxdb
+    app: telegraf
 spec:
-  type: LoadBalancer
   selector:
-    app: influxdb # Selects the pod called nginx
+    app: telegraf # Selects the pod called nginx
   ports:
-  - name: influxdb
-    port: 8086
-    targetPort: 8086
+  - name: telegraf
+    port: 8125
+    targetPort: 8125
 ---
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: influxdb
+  name: telegraf
   labels:
-    app: influxdb
+    app: telegraf
 spec:
   selector:
     matchLabels:
-      app: influxdb
+      app: telegraf
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: influxdb
+        app: telegraf
     spec:
+      serviceAccountName: admin
       containers:
-      - image: influxdb
+      - image: telegraf
         imagePullPolicy: Never
-        name: influxdb
+        name: telegraf
         ports:
-        - containerPort: 8086
-          name: influxdb
+        - containerPort: 8125
+          name: telegraf

@@ -6,5 +6,5 @@ EOF
 
 influxd
 rc-service influxdb start
-/etc/init.d/telegraf start
+# /etc/init.d/telegraf start
 tail -f /dev/null
