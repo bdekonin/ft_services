@@ -3,76 +3,71 @@
 SSH_USER="admin" # = default username for ssh
 SSH_PASSWORD="admin" # default password for ssh
 
-if [[ $(minikube status | grep -c "Running") == 0 ]]
-then
-	printf "✅  Starting minikube\n"
-	minikube start
-	#minikube addons enable ingress
 
-fi
-if [[ $(minikube status | grep -c "Running") != 0 ]]
-then
-	printf "✅  Already Started, getting information\n"
-fi
-MINIKUBE_IP=$(minikube ip)
+printf "✅  Starting minikube\n"
+minikube delete
+minikube start --vm-driver=virtualbox -cpus=2 --memory 3000
+minikube addons enable metallb
+minikube addons enable dashboard
 
 
-# kubectl create serviceaccount admin
-# kubectl
+# Setting up Minikube's Docker
 
-# Start things
-# Linking docker with minikube
 eval $(minikube docker-env)
 
-# HET LIGT HIER AAN VVVVVVVVVVVV
-echo "metallb설치"
-kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl diff -f - -n kube-system
-# warnig v
-kubectl get configmap kube-proxy -n kube-system -o yaml | sed -e "s/strictARP: false/strictARP: true/" | kubectl apply -f - -n kube-system
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/namespace.yaml
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.9.3/manifests/metallb.yaml
+
+# Configuring metallb:
+
 kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
 kubectl apply -f srcs/metallb/metallb.yaml
+
+
+# Creating an serviceaccount:
 
 kubectl create serviceaccount admin
 kubectl apply -f serviceaccount.yaml
 
-# Building nginx
-docker build -t mysql srcs/mysql # mysql
-kubectl apply -f srcs/mysql.yaml # mysql
 
+# Building mysql
+docker build -t mysql srcs/mysql
+kubectl apply -f srcs/mysql.yaml
+
+
+# Building Influxdb
 docker build -t influxdb srcs/influxdb
 kubectl apply -f srcs/influxdb.yaml
 
 
-docker build -t nginx srcs/nginx # nginx
-kubectl apply -f srcs/nginx.yaml # nginx
+# Building Nginx
+docker build -t nginx srcs/nginx
+kubectl apply -f srcs/nginx.yaml
 
-docker build -t phpmyadmin srcs/phpmyadmin # phpmyadmin
-kubectl apply -f srcs/phpmyadmin.yaml # phpmyadmin
 
-docker build -t wordpress srcs/wordpress # wordpress
-kubectl apply -f srcs/wordpress.yaml # wordpress
+# Building PhpMyAdmin
+docker build -t phpmyadmin srcs/phpmyadmin
+kubectl apply -f srcs/phpmyadmin.yaml
 
+
+# Building Wordpress
+docker build -t wordpress srcs/wordpress
+kubectl apply -f srcs/wordpress.yaml
+
+
+# Building Telegraf
 docker build -t telegraf srcs/telegraf
 kubectl apply -f srcs/telegraf.yaml
 
+
+# Building Grafana
 docker build -t grafana srcs/grafana
 kubectl apply -f srcs/grafana.yaml
 
 
-# A WordPress website listening on port 5050, which will work with a MySQL database.
-# Both services have to run in separate containers.
-# The WordPress website will have several users and an administrator.
-# Wordpress needs its own nginx server.
-# The Load Balancer should be able to redirect directly to this service.
-
-
-
-
-
-
 echo "--------------------------------------------------------------------------------
 Service:
-	phpmyadmin: 192.168.64.100:5000
-	nginx:		http://$MINIKUBE_IP"
+	WordPress:	192.168.99.100:5050
+		credentials: [xxx]-[xxx]
+	phpmyadmin: 192.168.99.100:5000
+		credentials: [root]-[password] do
+
+"

@@ -45,7 +45,7 @@ spec:
           value: "3306"
         - name: PMA_USER
           value: root
-        - name: MYSQL_ROOT_PASSWORD
+        - name: MYSQL_PASSWORD
           value: password
         ports:
         - containerPort: 80
