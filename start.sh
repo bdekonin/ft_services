@@ -6,7 +6,7 @@ SSH_PASSWORD="admin" # default password for ssh
 
 printf "✅  Starting minikube\n"
 minikube delete
-minikube start --vm-driver=virtualbox -cpus=2 --memory 3000
+minikube start --vm-driver=virtualbox
 minikube addons enable metallb
 minikube addons enable dashboard
 
@@ -66,8 +66,10 @@ kubectl apply -f srcs/grafana.yaml
 echo "--------------------------------------------------------------------------------
 Service:
 	WordPress:	192.168.99.100:5050
+		credentials: [admin]-[password]
+	PhpMyAdmin: 192.168.99.100:5000
+		credentials: [root]-[password]
+	Grafana: 192.168.99.100:3000
 		credentials: [xxx]-[xxx]
-	phpmyadmin: 192.168.99.100:5000
-		credentials: [root]-[password] do
 
 "

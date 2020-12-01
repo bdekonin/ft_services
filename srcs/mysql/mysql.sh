@@ -1,5 +1,7 @@
 #!/bin/sh
 
+mkdir -p /run/mysqld
+
 mysql_install_db --user=root > /dev/null
 echo "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;" >> /my.sql
 echo "SET PASSWORD FOR '$MYSQL_USER'@'localhost'=PASSWORD('${MYSQL_PASSWORD}');" >> /my.sql
