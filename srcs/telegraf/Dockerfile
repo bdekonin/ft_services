@@ -1,9 +1,5 @@
 FROM alpine:latest
 
-ENV INFLUXDB_NAME="monitoring" \
-	INFLUXDB_USER="admin" \
-	INFLUXDB_PASSWORD="password"
-
 RUN apk update
 RUN apk add openrc --no-cache
 RUN apk add curl

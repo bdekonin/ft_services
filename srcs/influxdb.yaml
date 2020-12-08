@@ -37,6 +37,13 @@ spec:
       - image: influxdb
         imagePullPolicy: Never
         name: influxdb
+        env:
+        - name: INFLUXDB_NAME
+          value: monitoring
+        - name: INFLUXDB_USER
+          value: admin
+        - name: INFLUXDB_PASSWORD
+          value: password
         ports:
         - containerPort: 8086
           name: influxdb

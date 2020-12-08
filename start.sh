@@ -38,6 +38,7 @@ docker build -t influxdb srcs/influxdb
 kubectl apply -f srcs/influxdb.yaml
 
 
+
 # Building Nginx
 docker build -t nginx srcs/nginx
 kubectl apply -f srcs/nginx.yaml
@@ -71,5 +72,4 @@ Service:
 		credentials: [root]-[password]
 	Grafana: 192.168.99.100:3000
 		credentials: [xxx]-[xxx]
-
 "

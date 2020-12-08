@@ -1,9 +1,5 @@
 FROM alpine:latest
 
-ENV INFLUXDB_NAME="monitoring" \
-	INFLUXDB_USER="admin" \
-	INFLUXDB_PASSWORD="password"
-
 RUN apk update
 RUN apk add openrc --no-cache
 RUN apk add telegraf influxdb --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted --no-cache
