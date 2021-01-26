@@ -1,10 +1,12 @@
-FROM alpine:latest
+FROM alpine:3.12
 
 # ENV  MYSQL_PASSWORD=password \
 #      MYSQL_DATABASE=wordpress_db \
 #      MYSQL_USER=root \
 # 	 MYSQL_PASSWORD=password
 
+RUN apk update
+RUN apk add openrc --no-cache
 RUN apk add --update mysql mysql-client && rm -f /var/cache/apk/*
 
 COPY my.cnf /etc/mysql/my.cnf

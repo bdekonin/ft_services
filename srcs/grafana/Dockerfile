@@ -1,19 +1,14 @@
-FROM alpine:latest
+FROM alpine:3.12
 
-RUN apk update
-RUN apk add openrc --no-cache
-RUN apk add telegraf grafana telegraf --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted --no-cache
+RUN apk update && \
+	apk add libc6-compat
 
+RUN wget https://dl.grafana.com/oss/release/grafana-7.2.1.linux-amd64.tar.gz && \
+	tar -zxvf grafana-7.2.1.linux-amd64.tar.gz && \
+	rm grafana-7.2.1.linux-amd64.tar.gz
 
-RUN openrc
-# otherwise error
-RUN touch /run/openrc/softlevel
-RUN rc-update add telegraf
+# COPY grafana.db /grafana-7.2.1/data/
 
-# https://github.com/gliderlabs/docker-alpine/issues/437
-VOLUME [ “/sys/fs/cgroup” ]
-
-WORKDIR /usr/share/grafana
 
 EXPOSE 3000
-CMD /etc/init.d/telegraf start && /usr/sbin/grafana-server --config=/etc/grafana.ini
+CMD cd grafana-7.2.1 && ./bin/grafana-server

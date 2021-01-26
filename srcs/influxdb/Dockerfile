@@ -1,15 +1,12 @@
-FROM alpine:latest
+FROM alpine:3.12
 
-RUN apk update
-RUN apk add openrc --no-cache
-RUN apk add telegraf influxdb --repository http://dl-3.alpinelinux.org/alpine/edge/testing/ --allow-untrusted --no-cache
-
-COPY srcs/setup.sh .
-
-RUN openrc
-# otherwise error
-RUN touch /run/openrc/softlevel
-# RUN rc-update add telegraf
+RUN apk update && \
+	apk add influxdb
 
 EXPOSE 8086
-CMD sh setup.sh
+
+#debugger command
+#RUN apk add vim
+#CMD tail -f /dev/null
+
+CMD influxd run -config /etc/influxdb.conf
