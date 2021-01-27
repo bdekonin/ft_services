@@ -1,4 +1,4 @@
-FROM alpine:3.12
+FROM alpine:3.11
 
 # ENV  MYSQL_PASSWORD=password \
 #      MYSQL_DATABASE=wordpress_db \

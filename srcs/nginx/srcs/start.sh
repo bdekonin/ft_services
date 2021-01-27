@@ -1,8 +1,8 @@
-mkdir -p /var/run/nginx
+# # Start telegraf (subshell)
+# /usr/bin/telegraf &
 
-ssh-keygen -A
-adduser --disabled-password admin
-echo "admin:admin" | chpasswd
-
+# Start SSH Daemon
 /usr/sbin/sshd
-/usr/sbin/nginx -g 'daemon off;'
+
+# Start nginx
+/usr/sbin/nginx -g "daemon off;"
