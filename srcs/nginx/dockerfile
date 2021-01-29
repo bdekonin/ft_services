@@ -24,10 +24,13 @@ RUN ssh-keygen -A && \
 	adduser -D admin && \
 	echo "admin:password" | chpasswd
 
-# # Install telegraf
-# RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ telegraf && \
-# 	mkdir -p /etc/telegraf && \
-# 	mv telegraf.conf /etc/telegraf/
+# Telegraf
+RUN mkdir /etc/telegraf
+COPY srcs/telegraf-1.15.3.tar.gz .
+COPY srcs/telegraf.conf /etc/telegraf/telegraf.conf
+RUN tar -zxvf telegraf-1.15.3.tar.gz
+RUN rm telegraf-1.15.3.tar.gz
+
 
 EXPOSE 22 80 443
 

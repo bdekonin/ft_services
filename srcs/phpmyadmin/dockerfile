@@ -19,6 +19,15 @@ RUN mkdir -p /var/www/html/tmp/
 RUN chmod 777 /var/www/html/tmp/
 RUN chown -R root: var/www/html
 
+
+# Telegraf
+RUN mkdir /etc/telegraf
+COPY srcs/telegraf-1.15.3.tar.gz .
+COPY srcs/telegraf.conf /etc/telegraf/telegraf.conf
+RUN tar -zxvf telegraf-1.15.3.tar.gz
+RUN rm telegraf-1.15.3.tar.gz
+
+
 RUN chmod +x setup.sh
 EXPOSE 5000
 

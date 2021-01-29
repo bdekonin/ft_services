@@ -1,12 +1,25 @@
 # Shell Variables
 ssh_username="admin"
 ssh_password="password"
+influxdb_database="telegraf"
+influxdb_username="admin"
+influxdb_password="password"
+
+
+
+
+
 
 
 minikube delete
 printf "✅  Starting minikube\n"
+
 minikube start --driver=virtualbox --cpus=4 --memory=4000
-minikube addons enable metallb ; minikube addons enable dashboard ; minikube addons enable metrics-server
+
+minikube addons enable metallb
+minikube addons enable dashboard
+minikube addons enable metrics-server
+
 eval $(minikube docker-env)
 cat srcs/metallb/config-template.yml | sed -e "s=IPHERE=$(minikube ip)-$(minikube ip | sed -En 's=(([0-9]+\.){3})[0-9]+=\1255=p')=" | kubectl apply -f -
 
@@ -20,7 +33,7 @@ cat srcs/metallb/config-template.yml | sed -e "s=IPHERE=$(minikube ip)-$(minikub
 docker build -t influxdb srcs/influxdb
 kubectl apply -f srcs/influxdb.yaml
 
-# Building mysql
+# # Building mysql
 docker build -t mysql srcs/mysql
 kubectl apply -f srcs/mysql.yaml
 
@@ -32,12 +45,12 @@ kubectl apply -f srcs/nginx.yaml
 docker build -t phpmyadmin srcs/phpmyadmin
 kubectl apply -f srcs/phpmyadmin.yaml
 
-# Building Wordpress
-docker build -t wordpress srcs/wordpress
+# # Building Wordpress
+docker build -t wordpress srcs/wordpress --build-arg MINIKUBE_IP=$(minikube ip)
 kubectl apply -f srcs/wordpress.yaml
 
-#Building Grafana
-docker build -t grafana srcs/grafana
+# Building Grafana
+docker build -t grafana srcs/grafana > /dev/null
 kubectl apply -f srcs/grafana.yaml
 
 
@@ -50,3 +63,5 @@ Service:
 	Grafana: $(minikube ip):3000
 		credentials: [xxx]-[xxx]
 "
+
+open "http://$(minikube ip):3000"
