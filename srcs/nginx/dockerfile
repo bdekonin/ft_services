@@ -2,6 +2,8 @@ FROM alpine:3.11
 
 # Copy
 COPY srcs/nginx.conf srcs/index.html srcs/start.sh ./
+
+# Setup SSL
 COPY srcs/ssl/localhost.pem localhost.pem
 COPY srcs/ssl/localhost-key.pem localhost-key.pem
 
@@ -11,13 +13,8 @@ RUN apk update && \
 
 # Setup nginx
 RUN mkdir -p /run/nginx www && \
-	mv nginx.conf /etc/nginx/ && \
+	mv nginx.conf /etc/nginx/nginx.conf && \
 	mv index.html /www/
-
-# # Setup SSL
-# RUN openssl req -new -newkey rsa:2048 -nodes -days 365 -x509 \
-# 	-subj "/C=FR/ST=IDF/L=Paris/O=42/OU=Federation/CN=localhost" \
-# 	-keyout /etc/ssl/private/services.key -out /etc/ssl/certs/services.crt
 
 # Setup SSH
 RUN ssh-keygen -A && \

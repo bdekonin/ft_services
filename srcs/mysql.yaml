@@ -12,19 +12,6 @@ spec:
       port: 3306
       targetPort: 3306
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-pv-claim
-  labels:
-    app: mysql
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi # How big the storage is (DEFAULT; 20Gi)
----
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
@@ -42,7 +29,7 @@ spec:
       labels:
         app: mysql
     spec:
-#          restartPolicy: Always
+      restartPolicy: Always # Restarts pod
       containers:
       - image: mysql
         imagePullPolicy: Never

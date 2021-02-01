@@ -9,8 +9,6 @@ RUN	apk add php7 php7-fpm php7-opcache php7-common php7-curl php7-json php7-mbst
 
 RUN mkdir -p /var/www/html
 
-# Nginx
-COPY srcs/nginx/default.conf etc/nginx/conf.d/default.conf
 
 # Wordpress cli
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
@@ -40,6 +38,9 @@ RUN echo $MINIKUBE_IP > ip.txt
 # Entrypoint
 COPY start.sh .
 RUN chmod +x start.sh
+
+# Nginx
+COPY srcs/nginx/default.conf etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 CMD sh /start.sh

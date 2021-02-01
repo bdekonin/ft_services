@@ -27,13 +27,20 @@ cat srcs/metallb/config-template.yml | sed -e "s=IPHERE=$(minikube ip)-$(minikub
 
 # # Creating an serviceaccount:
 # kubectl create serviceaccount admin
-# kubectl apply -f serviceaccount.yaml
+kubectl apply -f serviceaccount.yaml
+
+kubectl create clusterrolebinding service-reader-pod \
+  --clusterrole=service-reader  \
+  --serviceaccount=default:default
+
+# Creating PersistentVolumeClaims
+kubectl apply -f srcs/PersistentVolumeClaim.yaml
 
 # Building Influxdb
 docker build -t influxdb srcs/influxdb
 kubectl apply -f srcs/influxdb.yaml
 
-# # Building mysql
+# Building mysql
 docker build -t mysql srcs/mysql
 kubectl apply -f srcs/mysql.yaml
 
@@ -45,13 +52,20 @@ kubectl apply -f srcs/nginx.yaml
 docker build -t phpmyadmin srcs/phpmyadmin
 kubectl apply -f srcs/phpmyadmin.yaml
 
-# # Building Wordpress
+# Building Wordpress
 docker build -t wordpress srcs/wordpress --build-arg MINIKUBE_IP=$(minikube ip)
 kubectl apply -f srcs/wordpress.yaml
 
 # Building Grafana
 docker build -t grafana srcs/grafana > /dev/null
 kubectl apply -f srcs/grafana.yaml
+
+# Building Ftps
+docker build -t ftps srcs/ftps --build-arg MINIKUBE_IP=$(minikube ip)
+kubectl apply -f srcs/ftps.yaml
+
+
+
 
 
 echo "--------------------------------------------------------------------------------
@@ -64,4 +78,3 @@ Service:
 		credentials: [xxx]-[xxx]
 "
 
-open "http://$(minikube ip):3000"
