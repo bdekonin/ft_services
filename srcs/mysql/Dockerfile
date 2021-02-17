@@ -1,20 +1,15 @@
 FROM alpine:3.11
 
-# ENV  MYSQL_PASSWORD=password \
-#      MYSQL_DATABASE=wordpress_db \
-#      MYSQL_USER=root \
-# 	 MYSQL_PASSWORD=password
+RUN apk update && \
+	apk add mysql && \
+	apk add mysql-client && \
+	apk add --no-cache
 
-RUN apk update
-RUN apk add openrc --no-cache
-RUN apk add --update mysql mysql-client && rm -f /var/cache/apk/*
+# RUN addgroup mysql mysql
 
-COPY my.cnf /etc/mysql/my.cnf
-RUN mkdir /app
-
-RUN mkdir -p data/mysql/
-
-COPY mysql.sh mysql.sh
+COPY my.cnf /etc/
+COPY setup.sh /
+RUN chmod +x /setup.sh
 
 # Telegraf
 RUN mkdir /etc/telegraf
@@ -25,4 +20,4 @@ RUN rm telegraf-1.15.3.tar.gz
 
 # default port for the classic MySQL protocol
 EXPOSE 3306
-CMD sh /mysql.sh
+CMD sh /setup.sh

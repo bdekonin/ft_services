@@ -2,28 +2,33 @@ FROM alpine:3.11
 
 ARG MINIKUBE_IP
 
-# GENERAL
-RUN apk update
-RUN apk add nginx bash --no-cache
-RUN	apk add php7 php7-fpm php7-opcache php7-common php7-curl php7-json php7-mbstring php7-xml php7-zip php7-gd php7-soap php7-tokenizer php7-dom php7-exif php7-fileinfo php7-mysqli php7-zlib php7-phar
+RUN apk update && \
+	apk add nginx && \
+	apk add mysql-client && \
+	apk add jq && \
+	apk add curl && \
+	apk add php7 php7-fpm php7-opcache php7-common php7-curl php7-json php7-mbstring php7-xml php7-zip php7-gd php7-soap php7-tokenizer php7-dom php7-exif php7-fileinfo php7-mysqli php7-zlib php7-phar
 
-RUN mkdir -p /var/www/html
+# stuff
+COPY srcs/nginx/default.conf /etc/nginx/nginx.conf
+COPY setup.sh /
+RUN chmod +x /setup.sh
 
+# Ownership
+RUN adduser -D -g 'www' www && \
+	mkdir /www && \
+	mkdir /var/run/nginx && \
+	chown -R www:www /var/lib/nginx && \
+	chown -R www:www /www
 
 # Wordpress cli
 RUN wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chmod 777 wp-cli.phar
+RUN	chmod +x /www
 RUN mv wp-cli.phar /usr/local/bin/wp
 
-# Wordpress
-RUN wget https://wordpress.org/latest.tar.gz -P /tmp > /dev/null
-RUN tar xzf /tmp/latest.tar.gz --strip-components=1 -C /var/www/html > /dev/null
-COPY srcs/wp-config.php var/www/html/wp-config.php
-RUN chown -R root: /var/www/ > /dev/null
-RUN mkdir var/www/html/wp-content/uploads && chmod -R 777 var/www/html/wp-content/uploads > /dev/null
-COPY srcs/upload_max.zip /var/www/html/wp-content/plugins
-RUN cd /var/www/html/wp-content/plugins && unzip upload_max.zip && rm upload_max.zip > /dev/null
-
+# installing wp
+RUN cd /www && wp core download
 
 # Telegraf
 RUN mkdir /etc/telegraf
@@ -32,16 +37,7 @@ COPY srcs/telegraf.conf /etc/telegraf/telegraf.conf
 RUN tar -zxvf telegraf-1.15.3.tar.gz
 RUN rm telegraf-1.15.3.tar.gz
 
-
 RUN echo $MINIKUBE_IP > ip.txt
-
-# Entrypoint
-COPY start.sh .
-RUN chmod +x start.sh
-
-# Nginx
-COPY srcs/nginx/default.conf etc/nginx/conf.d/default.conf
-
 EXPOSE 80
-CMD sh /start.sh
+CMD ./setup.sh
 

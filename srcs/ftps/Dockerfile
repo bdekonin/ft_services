@@ -19,9 +19,16 @@ COPY vsftpd.conf etc/vsftpd/vsftpd.conf
 COPY setup.sh ftp/
 RUN chmod +x ftp/setup.sh
 
+
+
+# Telegraf
+RUN mkdir /etc/telegraf
+COPY telegraf-1.15.3.tar.gz .
+COPY telegraf.conf /etc/telegraf/telegraf.conf
+RUN tar -zxvf telegraf-1.15.3.tar.gz
+RUN rm telegraf-1.15.3.tar.gz
+
 EXPOSE 20 21 10000 10001 10002
-
-
 
 RUN echo $MINIKUBE_IP > ip.txt
 CMD /ftp/setup.sh
