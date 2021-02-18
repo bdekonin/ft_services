@@ -33,44 +33,55 @@ minikube addons enable metrics-server
 eval $(minikube docker-env)
 cat srcs/metallb/config-template.yml | sed -e "s=IPHERE=$(minikube ip)-$(minikube ip | sed -En 's=(([0-9]+\.){3})[0-9]+=\1255=p')=" | kubectl apply -f -
 
+
 # Creating an ClusterRole:
 kubectl apply -f srcs/ClusterRole.yaml
+
 
 # Binding the default service account to the ClusterRole
 kubectl create clusterrolebinding service-reader-pod \
   --clusterrole=service-reader  \
   --serviceaccount=default:default
 
+
 # Creating PersistentVolumeClaims
 kubectl apply -f srcs/PersistentVolumeClaim.yaml
+
 
 # Building Influxdb
 docker build -t influxdb srcs/influxdb
 kubectl apply -f srcs/influxdb.yaml
 
+
 # Building mysql
 docker build -t mysql srcs/mysql
 kubectl apply -f srcs/mysql.yaml
+
 
 # Building Nginx
 docker build -t nginx srcs/nginx
 kubectl apply -f srcs/nginx.yaml
 
+
 # Building PhpMyAdmin
 docker build -t phpmyadmin srcs/phpmyadmin
 kubectl apply -f srcs/phpmyadmin.yaml
+
 
 # Building Wordpress
 docker build -t wordpress srcs/wordpress --build-arg MINIKUBE_IP=$(minikube ip)
 kubectl apply -f srcs/wordpress.yaml
 
+
 # Building Grafana
 docker build -t grafana srcs/grafana > /dev/null
 kubectl apply -f srcs/grafana.yaml
 
+
 # Building Ftps
 docker build -t ftps srcs/ftps --build-arg MINIKUBE_IP=$(minikube ip)
-cat srcs/ftps.yaml | sed -e "s/CHANGEA/$ftps_username/g" | sed -e "s/CHANGEB/$ftps_password/g" | kubectl apply -f -
+kubectl apply -f srcs/ftps.yaml
+
 
 echo "--------------------------------------------------------------------------------
 Databases: (database - username - password)
@@ -89,3 +100,4 @@ Services: (username - password)
 	WordPress: $(minikube ip):5050
 		credentials: [$wordpress_username]-[$wordpress_password]
 "
+minikube dashboard
